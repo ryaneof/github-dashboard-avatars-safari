@@ -9,7 +9,7 @@
 	<key>CFBundleDisplayName</key>
 	<string>GitHub Dashboard Avatars</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.wednesday.night</string>
+	<string>com.wedsh.safari.githubDashboardAvatars</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleShortVersionString</key>
