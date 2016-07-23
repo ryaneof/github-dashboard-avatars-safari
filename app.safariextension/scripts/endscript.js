@@ -1,3 +1,4 @@
+'use strict';
 
 (function ($) {
 
@@ -71,16 +72,23 @@
       });
 
       // make requests, get avatar from GitHub
-      var users = Object.keys(userElemMap).map(function (userName) {
+      var users = Object.keys(userElemMap)
+      .filter(function (userName) {
+        return !!userName;
+      })
+      .map(function (userName) {
         return 'user%3A' + userName;
       });
-      var url = 'https://api.github.com/search/users?q=' + users.join('+') + '&per_page=' + users.length;
 
-      $.get(url, function (res) {
-        if (res.items instanceof Array) {
-          self.arouseSleepingAvatars(res.items);
-        }
-      });
+      if (users.length > 0) {
+        var url = 'https://api.github.com/search/users?q=' + users.join('+') + '&per_page=' + users.length;
+
+        $.get(url, function (res) {
+          if (res.items instanceof Array) {
+            self.arouseSleepingAvatars(res.items);
+          }
+        });
+      }
     },
 
     dismemberSingleAlert: function ($el) {
@@ -94,6 +102,7 @@
       $el.find('.details blockquote').css('paddingLeft', '0px');
       $el.find('.commits').css('paddingLeft', '0px');
       $el.find('.commits img').css({ 'width': '20px', 'height': '20px' });
+      $el.find('.release-assets').css('paddingLeft', '4px');
 
       if (!this.displayAllAvatars) {
 
@@ -129,10 +138,17 @@
       var secondAnchor = anchors[1];
       var thirdAnchor = anchors[2];
 
-      if (($el.hasClass('push') || $el.hasClass('create')) && !!thirdAnchor) {
+      if (($el.hasClass('push') || $el.hasClass('create') || $el.hasClass('release')) && !!thirdAnchor) {
         $repo = $(thirdAnchor);
       } else {
         $repo = $(secondAnchor);
+      }
+
+      if ($el.hasClass('member_add')) {
+        res.push({
+          $el: $(thirdAnchor),
+          user: $(thirdAnchor).text().split('/')[0]
+        });
       }
 
       var userName = $elUserName.text();
@@ -194,7 +210,7 @@
       // get display mode ['all' || 'none'], might be set at options page
       safari.self.addEventListener('message', function (e) {
         if (e.name === 'setSettings') {
-          settings = e.message;
+          var settings = e.message;
           self.displayAllAvatars = (settings.display !== 'none');
           self.metadata.alerts = self.elNews.querySelectorAll('.alert');
           self.metadata.count = self.metadata.alerts.length;
